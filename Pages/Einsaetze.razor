@@ -1,0 +1,94 @@
+@page "/einsaetze"
+@inject FeuerwehrRastenfeld.Services.DataService DataService
+
+<PageTitle>Einsätze – FF Rastenfeld</PageTitle>
+
+<div class="page-hero page-hero--sm">
+    <div class="page-hero-content">
+        <h1>Einsätze</h1>
+        <p>Chronik unserer Einsätze – transparent und aktuell</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+
+        <!-- Filter -->
+        <div class="filter-bar">
+            <button class="filter-btn @(activeFilter == "Alle" ? "active" : "")" @onclick='() => SetFilter("Alle")'>Alle</button>
+            <button class="filter-btn @(activeFilter == "Brand" ? "active" : "")" @onclick='() => SetFilter("Brand")'>🔥 Brand</button>
+            <button class="filter-btn @(activeFilter == "THL" ? "active" : "")" @onclick='() => SetFilter("THL")'>🚗 THL</button>
+            <button class="filter-btn @(activeFilter == "Unwetter" ? "active" : "")" @onclick='() => SetFilter("Unwetter")'>⛈️ Unwetter</button>
+            <button class="filter-btn @(activeFilter == "Gefahrgut" ? "active" : "")" @onclick='() => SetFilter("Gefahrgut")'>⚠️ Gefahrgut</button>
+            <button class="filter-btn @(activeFilter == "Sonstige" ? "active" : "")" @onclick='() => SetFilter("Sonstige")'>🦌 Sonstige</button>
+        </div>
+
+        <!-- Statistik -->
+        <div class="einsatz-stats">
+            <div class="einsatz-stat-item">
+                <strong>@allEinsaetze.Count</strong>
+                <span>Einsätze gesamt</span>
+            </div>
+            <div class="einsatz-stat-item">
+                <strong>@allEinsaetze.Count(e => e.Kategorie == "Brand")</strong>
+                <span>Brandeinsätze</span>
+            </div>
+            <div class="einsatz-stat-item">
+                <strong>@allEinsaetze.Count(e => e.Kategorie == "THL")</strong>
+                <span>Techn. Hilfe</span>
+            </div>
+            <div class="einsatz-stat-item">
+                <strong>@allEinsaetze.Sum(e => e.AnzahlKraefte)</strong>
+                <span>Kräfteeinsätze</span>
+            </div>
+        </div>
+
+        <!-- Liste -->
+        <div class="einsatz-list">
+            @foreach (var e in filteredEinsaetze)
+            {
+                <div class="einsatz-list-item">
+                    <div class="eli-icon">@e.Icon</div>
+                    <div class="eli-body">
+                        <div class="eli-header">
+                            <span class="einsatz-badge einsatz-badge--@e.Kategorie.ToLower()">@e.Kategorie</span>
+                            <span class="eli-date">@e.Datum.ToString("dd.MM.yyyy – HH:mm") Uhr</span>
+                        </div>
+                        <h3>@e.Titel</h3>
+                        <p>@e.Beschreibung</p>
+                        <div class="eli-meta">
+                            <span>📍 @e.Ort</span>
+                            <span>👥 @e.AnzahlKraefte Einsatzkräfte</span>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (!filteredEinsaetze.Any())
+            {
+                <div class="empty-state">
+                    <p>Keine Einsätze in dieser Kategorie.</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<FeuerwehrRastenfeld.Models.Einsatz> allEinsaetze = new();
+    private List<FeuerwehrRastenfeld.Models.Einsatz> filteredEinsaetze = new();
+    private string activeFilter = "Alle";
+
+    protected override void OnInitialized()
+    {
+        allEinsaetze = DataService.GetEinsaetze().OrderByDescending(e => e.Datum).ToList();
+        filteredEinsaetze = allEinsaetze;
+    }
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
+        filteredEinsaetze = filter == "Alle"
+            ? allEinsaetze
+            : allEinsaetze.Where(e => e.Kategorie == filter).ToList();
+    }
+}

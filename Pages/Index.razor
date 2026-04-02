@@ -1,0 +1,181 @@
+@page "/"
+@inject FeuerwehrRastenfeld.Services.DataService DataService
+
+<PageTitle>FF Rastenfeld – Freiwillige Feuerwehr Rastenfeld</PageTitle>
+
+<!-- HERO SECTION -->
+<section class="hero">
+    <div class="hero-bg">
+        <div class="hero-overlay"></div>
+        <div class="flame-particles">
+            @for (int i = 0; i < 12; i++)
+            {
+                <div class="flame-particle" style="--delay:@(i * 0.3)s; --x:@(i * 8 + 4)%"></div>
+            }
+        </div>
+    </div>
+    <div class="hero-content">
+        <div class="hero-badge fade-in">Niederösterreich · Bezirk Krems-Land</div>
+        <h1 class="hero-title fade-in-up">
+            Freiwillige Feuerwehr<br />
+            <span class="hero-highlight">Rastenfeld</span>
+        </h1>
+        <p class="hero-subtitle fade-in-up">Für unsere Gemeinschaft. Jederzeit. Mit vollem Einsatz.</p>
+        <div class="hero-stats fade-in-up">
+            <div class="stat">
+                <strong>40+</strong>
+                <span>Aktive Mitglieder</span>
+            </div>
+            <div class="stat">
+                <strong>4</strong>
+                <span>Einsatzfahrzeuge</span>
+            </div>
+            <div class="stat">
+                <strong>148</strong>
+                <span>Jahre im Dienst</span>
+            </div>
+            <div class="stat">
+                <strong>24/7</strong>
+                <span>Einsatzbereit</span>
+            </div>
+        </div>
+        <div class="hero-actions fade-in-up">
+            <a href="/einsaetze" class="btn btn-primary">Aktuelle Einsätze</a>
+            <a href="/ueber-uns" class="btn btn-outline">Über uns</a>
+        </div>
+    </div>
+    <div class="hero-scroll-hint">
+        <span>Scrollen</span>
+        <div class="scroll-arrow"></div>
+    </div>
+</section>
+
+<!-- NOTRUF BANNER -->
+<div class="notruf-banner">
+    <span class="pulse-dot"></span>
+    <strong>Im Notfall: 122 anrufen!</strong>
+    <span>Feuerwehr Notruf – kostenlos – 24/7</span>
+    <a href="tel:122" class="btn-notruf">Jetzt anrufen</a>
+</div>
+
+<!-- KURZVORSTELLUNG -->
+<section class="section intro-section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-label">Wer wir sind</span>
+            <h2>Bereit wenn es darauf ankommt</h2>
+            <p>Die Freiwillige Feuerwehr Rastenfeld schützt seit 1876 Menschen, Tiere und Sachwerte in Rastenfeld und den umliegenden Ortschaften im Bezirk Krems-Land.</p>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🔥</div>
+                <h3>Brandbekämpfung</h3>
+                <p>Modernste Löschausrüstung und bestens ausgebildete Kräfte für jeden Brandeinsatz – von Zimmerbrand bis Waldbrand.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🚗</div>
+                <h3>Technische Hilfe</h3>
+                <p>Rettung von Personen aus Fahrzeugen, Beseitigung von Unfallfolgen und technische Hilfeleistung jeder Art.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⛈️</div>
+                <h3>Unwetterhilfe</h3>
+                <p>Beim Unwetter sind wir sofort zur Stelle: Bäume freischneiden, Keller auspumpen, Sandsäcke verlegen.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Gemeinschaft</h3>
+                <p>Mehr als Feuerwehr – wir sind ein wichtiger Teil der Dorfgemeinschaft und organisieren Veranstaltungen für alle.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- AKTUELLE EINSÄTZE -->
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-label">Aktuell</span>
+            <h2>Letzte Einsätze</h2>
+        </div>
+        <div class="einsatz-preview-grid">
+            @foreach (var e in recentEinsaetze)
+            {
+                <div class="einsatz-card">
+                    <div class="einsatz-icon">@e.Icon</div>
+                    <div class="einsatz-info">
+                        <span class="einsatz-badge einsatz-badge--@e.Kategorie.ToLower()">@e.Kategorie</span>
+                        <h4>@e.Titel</h4>
+                        <p>@e.Beschreibung.Substring(0, Math.Min(100, e.Beschreibung.Length))...</p>
+                        <div class="einsatz-meta">
+                            <span>📍 @e.Ort</span>
+                            <span>👥 @e.AnzahlKraefte Kräfte</span>
+                            <span>📅 @e.Datum.ToString("dd.MM.yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div style="text-align:center;margin-top:2rem;">
+            <a href="/einsaetze" class="btn btn-primary">Alle Einsätze anzeigen</a>
+        </div>
+    </div>
+</section>
+
+<!-- NEWS -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-label">Aktuelles</span>
+            <h2>News & Berichte</h2>
+        </div>
+        <div class="news-grid">
+            @foreach (var n in recentNews)
+            {
+                <div class="news-card">
+                    <div class="news-card-img">
+                        <div class="news-placeholder-img">📰</div>
+                        <span class="news-kategorie">@n.Kategorie</span>
+                    </div>
+                    <div class="news-card-body">
+                        <span class="news-date">@n.Datum.ToString("dd. MMMM yyyy")</span>
+                        <h4>@n.Titel</h4>
+                        <p>@n.Kurztext</p>
+                        <a href="/news/@n.Id" class="btn btn-sm">Weiterlesen →</a>
+                    </div>
+                </div>
+            }
+        </div>
+        <div style="text-align:center;margin-top:2rem;">
+            <a href="/news" class="btn btn-outline">Alle News</a>
+        </div>
+    </div>
+</section>
+
+<!-- MITMACHEN CTA -->
+<section class="section cta-section">
+    <div class="container">
+        <div class="cta-box">
+            <div class="cta-content">
+                <h2>Werde Teil der Feuerwehr!</h2>
+                <p>Du bist mindestens 15 Jahre alt und möchtest etwas für deine Gemeinde tun? Wir freuen uns über jede Verstärkung – egal ob Mann, Frau oder Jugendliche/r.</p>
+                <div class="cta-actions">
+                    <a href="/kontakt" class="btn btn-primary">Jetzt mitmachen</a>
+                    <a href="/mannschaft" class="btn btn-outline">Unser Team</a>
+                </div>
+            </div>
+            <div class="cta-icon">🧯</div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<FeuerwehrRastenfeld.Models.Einsatz> recentEinsaetze = new();
+    private List<FeuerwehrRastenfeld.Models.NewsArtikel> recentNews = new();
+
+    protected override void OnInitialized()
+    {
+        recentEinsaetze = DataService.GetEinsaetze().Take(3).ToList();
+        recentNews = DataService.GetNews().Take(3).ToList();
+    }
+}

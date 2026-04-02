@@ -1,0 +1,93 @@
+@page "/news"
+@page "/news/{Id:int}"
+@inject FeuerwehrRastenfeld.Services.DataService DataService
+
+<PageTitle>News – FF Rastenfeld</PageTitle>
+
+@if (selectedArtikel is not null)
+{
+    <!-- DETAIL ANSICHT -->
+    <div class="page-hero page-hero--sm">
+        <div class="page-hero-content">
+            <h1>@selectedArtikel.Titel</h1>
+            <p>@selectedArtikel.Datum.ToString("dd. MMMM yyyy") · @selectedArtikel.Autor</p>
+        </div>
+    </div>
+    <section class="section">
+        <div class="container container--narrow">
+            <a href="/news" class="btn btn-outline" style="margin-bottom:2rem;">← Zurück zur Übersicht</a>
+            <span class="news-kategorie">@selectedArtikel.Kategorie</span>
+            <div class="news-detail-placeholder">📰</div>
+            <div class="news-detail-body">
+                <p>@selectedArtikel.Volltext</p>
+            </div>
+        </div>
+    </section>
+}
+else
+{
+    <!-- ÜBERSICHT -->
+    <div class="page-hero page-hero--sm">
+        <div class="page-hero-content">
+            <h1>News & Aktuelles</h1>
+            <p>Berichte, Veranstaltungen und Informationen der FF Rastenfeld</p>
+        </div>
+    </div>
+    <section class="section">
+        <div class="container">
+            <!-- Kategorie-Filter -->
+            <div class="filter-bar">
+                @foreach (var kat in kategorien)
+                {
+                    <button class="filter-btn @(activeFilter == kat ? "active" : "")" @onclick="() => SetFilter(kat)">@kat</button>
+                }
+            </div>
+
+            <div class="news-grid news-grid--full">
+                @foreach (var n in filteredNews)
+                {
+                    <div class="news-card">
+                        <div class="news-card-img">
+                            <div class="news-placeholder-img">📰</div>
+                            <span class="news-kategorie">@n.Kategorie</span>
+                        </div>
+                        <div class="news-card-body">
+                            <span class="news-date">@n.Datum.ToString("dd. MMMM yyyy")</span>
+                            <h4>@n.Titel</h4>
+                            <p>@n.Kurztext</p>
+                            <div class="news-footer">
+                                <span class="news-autor">✍️ @n.Autor</span>
+                                <a href="/news/@n.Id" class="btn btn-sm">Weiterlesen →</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter] public int? Id { get; set; }
+
+    private List<FeuerwehrRastenfeld.Models.NewsArtikel> allNews = new();
+    private List<FeuerwehrRastenfeld.Models.NewsArtikel> filteredNews = new();
+    private FeuerwehrRastenfeld.Models.NewsArtikel? selectedArtikel;
+    private List<string> kategorien = new();
+    private string activeFilter = "Alle";
+
+    protected override void OnParametersSet()
+    {
+        allNews = DataService.GetNews().OrderByDescending(n => n.Datum).ToList();
+        kategorien = new[] { "Alle" }.Concat(allNews.Select(n => n.Kategorie).Distinct()).ToList();
+        filteredNews = allNews;
+
+        selectedArtikel = Id.HasValue ? allNews.FirstOrDefault(n => n.Id == Id.Value) : null;
+    }
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
+        filteredNews = filter == "Alle" ? allNews : allNews.Where(n => n.Kategorie == filter).ToList();
+    }
+}

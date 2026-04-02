@@ -1,0 +1,107 @@
+@page "/galerie"
+@inject FeuerwehrRastenfeld.Services.DataService DataService
+
+<PageTitle>Galerie – FF Rastenfeld</PageTitle>
+
+<div class="page-hero page-hero--sm">
+    <div class="page-hero-content">
+        <h1>Galerie</h1>
+        <p>Einblicke in unsere Arbeit und Gemeinschaft</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        <div class="filter-bar">
+            @foreach (var kat in kategorien)
+            {
+                <button class="filter-btn @(activeFilter == kat ? "active" : "")" @onclick="() => SetFilter(kat)">@kat</button>
+            }
+        </div>
+
+        <div class="galerie-grid">
+            @foreach (var bild in filteredBilder)
+            {
+                <div class="galerie-item" @onclick="() => OpenLightbox(bild)">
+                    <div class="galerie-placeholder">
+                        <span class="galerie-emoji">@GetEmoji(bild.Kategorie)</span>
+                    </div>
+                    <div class="galerie-overlay">
+                        <span class="galerie-title">@bild.Titel</span>
+                        <span class="galerie-year">@bild.Jahr</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- LIGHTBOX -->
+@if (lightboxBild is not null)
+{
+    <div class="lightbox-overlay" @onclick="CloseLightbox">
+        <div class="lightbox-content" @onclick:stopPropagation>
+            <button class="lightbox-close" @onclick="CloseLightbox">✕</button>
+            <div class="lightbox-img">
+                <span class="lightbox-emoji">@GetEmoji(lightboxBild.Kategorie)</span>
+            </div>
+            <div class="lightbox-info">
+                <h3>@lightboxBild.Titel</h3>
+                <p>@lightboxBild.Kategorie · @lightboxBild.Jahr</p>
+            </div>
+            <div class="lightbox-nav">
+                <button @onclick="PrevBild">← Zurück</button>
+                <span>@(filteredBilder.IndexOf(lightboxBild) + 1) / @filteredBilder.Count</span>
+                <button @onclick="NextBild">Weiter →</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<FeuerwehrRastenfeld.Models.GalerieBild> allBilder = new();
+    private List<FeuerwehrRastenfeld.Models.GalerieBild> filteredBilder = new();
+    private FeuerwehrRastenfeld.Models.GalerieBild? lightboxBild;
+    private List<string> kategorien = new();
+    private string activeFilter = "Alle";
+
+    protected override void OnInitialized()
+    {
+        allBilder = DataService.GetGalerie();
+        kategorien = new[] { "Alle" }.Concat(allBilder.Select(b => b.Kategorie).Distinct()).ToList();
+        filteredBilder = allBilder;
+    }
+
+    private void SetFilter(string filter)
+    {
+        activeFilter = filter;
+        filteredBilder = filter == "Alle" ? allBilder : allBilder.Where(b => b.Kategorie == filter).ToList();
+        lightboxBild = null;
+    }
+
+    private void OpenLightbox(FeuerwehrRastenfeld.Models.GalerieBild bild) => lightboxBild = bild;
+    private void CloseLightbox() => lightboxBild = null;
+
+    private void NextBild()
+    {
+        var idx = filteredBilder.IndexOf(lightboxBild!);
+        lightboxBild = filteredBilder[(idx + 1) % filteredBilder.Count];
+    }
+
+    private void PrevBild()
+    {
+        var idx = filteredBilder.IndexOf(lightboxBild!);
+        lightboxBild = filteredBilder[(idx - 1 + filteredBilder.Count) % filteredBilder.Count];
+    }
+
+    private string GetEmoji(string kat) => kat switch
+    {
+        "Übungen" => "🧯",
+        "Einsätze" => "🔥",
+        "Fahrzeuge" => "🚒",
+        "Veranstaltungen" => "🎉",
+        "Jugend" => "👦",
+        "Ausbildung" => "🎓",
+        _ => "📷"
+    };
+}

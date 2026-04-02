@@ -1,0 +1,14 @@
+@inherits LayoutComponentBase
+@using FeuerwehrRastenfeld.Components
+
+<div class="page-wrapper">
+    <NavMenu />
+    <main class="main-content">
+        @Body
+    </main>
+    <Footer />
+</div>
+
+<div id="scroll-to-top" class="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    ▲
+</div>

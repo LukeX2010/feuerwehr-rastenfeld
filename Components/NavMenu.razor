@@ -1,0 +1,39 @@
+@using Microsoft.AspNetCore.Components.Routing
+@inject NavigationManager Nav
+
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <a class="nav-brand" href="/">
+            <span class="brand-icon">🔥</span>
+            <span class="brand-text">
+                <strong>FF Rastenfeld</strong>
+                <small>Niederösterreich</small>
+            </span>
+        </a>
+
+        <button class="nav-toggle" @onclick="ToggleMenu" aria-label="Menü öffnen">
+            <span class="@(isOpen ? "open" : "")"></span>
+            <span class="@(isOpen ? "open" : "")"></span>
+            <span class="@(isOpen ? "open" : "")"></span>
+        </button>
+
+        <ul class="nav-links @(isOpen ? "open" : "")">
+            <li><NavLink href="/" Match="NavLinkMatch.All" @onclick="CloseMenu">Startseite</NavLink></li>
+            <li><NavLink href="/ueber-uns" @onclick="CloseMenu">Über uns</NavLink></li>
+            <li><NavLink href="/mannschaft" @onclick="CloseMenu">Mannschaft</NavLink></li>
+            <li><NavLink href="/einsaetze" @onclick="CloseMenu">Einsätze</NavLink></li>
+            <li><NavLink href="/fahrzeuge" @onclick="CloseMenu">Fahrzeuge</NavLink></li>
+            <li><NavLink href="/news" @onclick="CloseMenu">News</NavLink></li>
+            <li><NavLink href="/galerie" @onclick="CloseMenu">Galerie</NavLink></li>
+            <li><NavLink href="/kontakt" @onclick="CloseMenu">Kontakt</NavLink></li>
+            <li class="notruf-btn"><a href="tel:122">🚨 NOTRUF 122</a></li>
+        </ul>
+    </div>
+</nav>
+
+@code {
+    private bool isOpen = false;
+
+    private void ToggleMenu() => isOpen = !isOpen;
+    private void CloseMenu() => isOpen = false;
+}

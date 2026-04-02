@@ -1,0 +1,74 @@
+@page "/mannschaft"
+@inject FeuerwehrRastenfeld.Services.DataService DataService
+
+<PageTitle>Mannschaft – FF Rastenfeld</PageTitle>
+
+<div class="page-hero page-hero--sm">
+    <div class="page-hero-content">
+        <h1>Unsere Mannschaft</h1>
+        <p>@mitglieder.Count aktive Mitglieder – eine starke Gemeinschaft</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        <!-- Führung -->
+        <div class="section-header">
+            <span class="section-label">Führung</span>
+            <h2>Kommando</h2>
+        </div>
+        <div class="mannschaft-grid mannschaft-grid--fuehrung">
+            @foreach (var m in fuehrung)
+            {
+                <div class="mitglied-card mitglied-card--featured">
+                    <div class="mitglied-avatar">
+                        <span class="avatar-icon">👷</span>
+                    </div>
+                    <div class="mitglied-dienstgrad">@m.Dienstgrad</div>
+                    <h3>@m.Name</h3>
+                    <div class="mitglied-funktion">@m.Funktion</div>
+                    <div class="mitglied-jahre">Dabei seit @m.DienstjahreAb</div>
+                </div>
+            }
+        </div>
+
+        <!-- Alle Mitglieder -->
+        <div class="section-header" style="margin-top:4rem;">
+            <span class="section-label">Aktive Kräfte</span>
+            <h2>Einsatzmitglieder</h2>
+        </div>
+        <div class="mannschaft-grid">
+            @foreach (var m in einsatzkraefte)
+            {
+                <div class="mitglied-card">
+                    <div class="mitglied-avatar mitglied-avatar--sm">
+                        <span class="avatar-icon">🧑‍🚒</span>
+                    </div>
+                    <div class="mitglied-dienstgrad">@m.Dienstgrad</div>
+                    <h4>@m.Name</h4>
+                    <div class="mitglied-funktion">@m.Funktion</div>
+                    <div class="mitglied-jahre">Dabei seit @m.DienstjahreAb</div>
+                </div>
+            }
+        </div>
+
+        <div class="join-box">
+            <h3>🙋 Verstärke unser Team!</h3>
+            <p>Wir freuen uns über jeden neuen Kamerad und jede neue Kameradin. Ob jung oder alt – bei uns ist jeder willkommen der Lust hat, für die Gemeinschaft da zu sein.</p>
+            <a href="/kontakt" class="btn btn-primary">Jetzt bewerben</a>
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<FeuerwehrRastenfeld.Models.Mitglied> mitglieder = new();
+    private List<FeuerwehrRastenfeld.Models.Mitglied> fuehrung = new();
+    private List<FeuerwehrRastenfeld.Models.Mitglied> einsatzkraefte = new();
+
+    protected override void OnInitialized()
+    {
+        mitglieder = DataService.GetMitglieder();
+        fuehrung = mitglieder.Where(m => m.Funktion.Contains("Kommandant") || m.Funktion == "Atemschutzwart" || m.Funktion == "Gerätewart" || m.Funktion == "Schriftführer" || m.Funktion == "Kassier").ToList();
+        einsatzkraefte = mitglieder.Except(fuehrung).ToList();
+    }
+}

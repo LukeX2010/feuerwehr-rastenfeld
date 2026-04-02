@@ -1,0 +1,80 @@
+@page "/fahrzeuge"
+@inject FeuerwehrRastenfeld.Services.DataService DataService
+
+<PageTitle>Fahrzeuge & Ausrüstung – FF Rastenfeld</PageTitle>
+
+<div class="page-hero page-hero--sm">
+    <div class="page-hero-content">
+        <h1>Fahrzeuge & Ausrüstung</h1>
+        <p>Unser moderner Fuhrpark im Überblick</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        @foreach (var f in fahrzeuge)
+        {
+            <div class="fahrzeug-card">
+                <div class="fahrzeug-img">
+                    <div class="fahrzeug-placeholder">🚒</div>
+                    <div class="fahrzeug-kuerzel">@f.Kurzbezeichnung</div>
+                </div>
+                <div class="fahrzeug-body">
+                    <h2>@f.Name <span class="fahrzeug-badge">@f.Kurzbezeichnung</span></h2>
+                    <div class="fahrzeug-meta">
+                        <span>🏭 @f.Hersteller</span>
+                        <span>📅 Baujahr @f.Baujahr</span>
+                    </div>
+                    <p>@f.Beschreibung</p>
+                    <h4>Ausstattung</h4>
+                    <ul class="ausstattung-list">
+                        @foreach (var a in f.Ausstattung)
+                        {
+                            <li><span class="check">✓</span> @a</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+<section class="section section-dark">
+    <div class="container">
+        <div class="section-header">
+            <span class="section-label">Ausrüstung</span>
+            <h2>Weitere Ausrüstung</h2>
+        </div>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">😮‍💨</div>
+                <h3>Atemschutz</h3>
+                <p>10 Pressluftatmer, Atemschutzüberwachung, CO-Messgeräte, Wärmebildkamera</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3>Beleuchtung</h3>
+                <p>Mobiler Lichtmast 4×1000W, LED-Handleuchten, Flutlichter für Nacht­einsätze</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🪚</div>
+                <h3>Motorsägen & Geräte</h3>
+                <p>3 Motorsägen, Trennschleifer, Freischneider, Hebekissen­satz, Werkzeugkoffer</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💧</div>
+                <h3>Pumpen</h3>
+                <p>Tragkraftspritze TS 8/8, 2× Tauchpumpen, Schaummittelzumischer</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+@code {
+    private List<FeuerwehrRastenfeld.Models.Fahrzeug> fahrzeuge = new();
+
+    protected override void OnInitialized()
+    {
+        fahrzeuge = DataService.GetFahrzeuge();
+    }
+}
